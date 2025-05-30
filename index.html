@@ -21,10 +21,10 @@
         }
         #game-canvas {
             border: 2px solid #333;
-            margin-top: 10px;
+            margin: 0;
             touch-action: none;
-            max-width: 100%;
-            height: auto;
+            width: 100vw;
+            height: 100vh;
         }
         #ui-container {
             position: fixed;
@@ -67,55 +67,9 @@
             font-size: 24px;
             z-index: 1000;
         }
-        #mobile-controls {
-            position: fixed;
-            bottom: 120px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: grid;
-            grid-template-areas:
-                ". up ."
-                "left . right"
-                ". down .";
-            gap: 20px;
-            background: rgba(255, 255, 255, 0.7);
-            padding: 20px;
-            border-radius: 20px;
-            touch-action: none;
-            z-index: 100;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .control-button {
-            width: 70px;
-            height: 70px;
-            border: none;
-            border-radius: 35px;
-            background: #4CAF50;
-            color: white;
-            font-size: 28px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            touch-action: none;
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        .control-button:active {
-            background: #45a049;
-            transform: scale(0.95);
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-        }
-        #up-button { grid-area: up; }
-        #left-button { grid-area: left; }
-        #right-button { grid-area: right; }
-        #down-button { grid-area: down; }
-
         #next-pose-button {
             position: fixed;
-            bottom: 30px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 100;
@@ -158,31 +112,16 @@
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
         }
 
-        /* PCの場合はモバイルコントロールを非表示 */
-        @media (min-width: 1024px) {
-            #mobile-controls {
-                display: none;
-            }
-        }
-
         /* スマートフォンの場合の調整 */
         @media (max-width: 767px) {
             #game-canvas {
-                margin-top: 5px;
+                margin: 0;
+                width: 100vw;
+                height: 100vh;
             }
             #ui-container {
                 font-size: 14px;
                 padding: 8px;
-            }
-            .control-button {
-                width: 60px;
-                height: 60px;
-                font-size: 24px;
-            }
-            #mobile-controls {
-                bottom: 100px;
-                gap: 15px;
-                padding: 15px;
             }
             .next-pose-btn {
                 padding: 12px 24px;
@@ -196,6 +135,25 @@
                 font-size: 14px;
                 margin: 8px 0;
             }
+            #next-pose-button {
+                bottom: 20px;
+            }
+        }
+
+        /* 操作説明のオーバーレイ */
+        .control-hint {
+            position: fixed;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #333;
+            z-index: 100;
+            pointer-events: none;
+            opacity: 0.8;
         }
     </style>
 </head>
@@ -208,8 +166,9 @@
     <div id="start-screen">
         <h1>OTS組体操</h1>
         <p>スー美香を積み上げて組体操を完成させよう！</p>
-        <p>落ちてくるポーズを矢印キーで動かしてバランスを取ろう！</p>
-        <p>土台から落ちるとゲームオーバー！</p>
+        <p>左右スワイプで移動！</p>
+        <p>タップでポーズを回転！</p>
+        <p>下スワイプで落下速度アップ！</p>
         <button onclick="startGame()" class="animal-button">スタート！</button>
     </div>
     <div id="game-over-screen">
@@ -218,11 +177,8 @@
         <p>経過時間: <span id="final-time">0</span>秒</p>
         <button onclick="restartGame()" class="animal-button">もう一度遊ぶ</button>
     </div>
-    <div id="mobile-controls">
-        <button id="up-button" class="control-button">↑</button>
-        <button id="left-button" class="control-button">←</button>
-        <button id="right-button" class="control-button">→</button>
-        <button id="down-button" class="control-button">↓</button>
+    <div class="control-hint">
+        ← スワイプで移動 → / タップで回転
     </div>
     <div id="next-pose-button">
         <button onclick="createPose()" class="next-pose-btn">
