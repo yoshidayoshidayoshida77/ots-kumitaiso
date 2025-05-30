@@ -8,12 +8,13 @@ const DEBUG = true;
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
 // ゲーム設定
-const CANVAS_WIDTH = 800;  // PCの画面サイズを固定
-const CANVAS_HEIGHT = 600; // PCの画面サイズを固定
+const CANVAS_WIDTH = 800;
+const CANVAS_HEIGHT = 600;
 const GROUND_HEIGHT = 60;
 const WALL_THICKNESS = 60;
-const PLATFORM_WIDTH = 300;  // プラットフォームの幅を固定
+const PLATFORM_WIDTH = 300;
 const PLATFORM_HEIGHT = 20;
+const MOBILE_BUTTON_HEIGHT = 60; // モバイルボタンの高さ
 const SPAWN_INTERVAL = 3000; // ミリ秒
 const MAX_BODIES = 30; // 最大物体数
 const PIXELS_PER_METER = 50; // 50ピクセルを1メートルとして換算
@@ -33,85 +34,85 @@ let targetCameraY = 0;
 // ポーズの設定（画像パスを追加）
 const POSES = {
     pose1: { 
-        width: 90,  // PCサイズを固定
-        height: 180, 
+        width: isMobile ? 45 : 90,  // モバイルの場合は50%サイズ
+        height: isMobile ? 90 : 180, 
         mass: 5, 
         imagePath: './images/S__56541186_0.png',
         name: '両手上げポーズ1'
     },
     pose2: { 
-        width: 90,
-        height: 180,
+        width: isMobile ? 45 : 90,
+        height: isMobile ? 90 : 180,
         mass: 5, 
         imagePath: './images/S__56541188_0.png',
         name: '片手上げポーズ1'
     },
     pose3: { 
-        width: 90,
-        height: 180,
+        width: isMobile ? 45 : 90,
+        height: isMobile ? 90 : 180,
         mass: 5, 
         imagePath: './images/S__56541189_0.png',
         name: '両手上げポーズ2'
     },
     pose4: { 
-        width: 90,
-        height: 180,
+        width: isMobile ? 45 : 90,
+        height: isMobile ? 90 : 180,
         mass: 5, 
         imagePath: './images/S__56541190_0.png',
         name: 'バンザイポーズ'
     },
     pose5: { 
-        width: 90,
-        height: 180,
+        width: isMobile ? 45 : 90,
+        height: isMobile ? 90 : 180,
         mass: 5, 
         imagePath: './images/S__56541191_0.png',
         name: '両手広げポーズ'
     },
     pose6: { 
-        width: 90,
-        height: 180,
+        width: isMobile ? 45 : 90,
+        height: isMobile ? 90 : 180,
         mass: 5, 
         imagePath: './images/S__56541192_0.png',
         name: 'ジャンプポーズ1'
     },
     pose7: { 
-        width: 90,
-        height: 180,
+        width: isMobile ? 45 : 90,
+        height: isMobile ? 90 : 180,
         mass: 5, 
         imagePath: './images/S__56541193_0.png',
         name: '片手上げポーズ2'
     },
     pose8: { 
-        width: 90,
-        height: 180,
+        width: isMobile ? 45 : 90,
+        height: isMobile ? 90 : 180,
         mass: 5, 
         imagePath: './images/S__56541194_0.png',
         name: '両手広げポーズ2'
     },
     pose9: { 
-        width: 90,
-        height: 180,
+        width: isMobile ? 45 : 90,
+        height: isMobile ? 90 : 180,
         mass: 5, 
         imagePath: './images/S__56541195_0.png',
         name: '横向きポーズ1'
     },
     pose10: { 
-        width: 90,
-        height: 180,
+        width: isMobile ? 45 : 90,
+        height: isMobile ? 90 : 180,
         mass: 5, 
         imagePath: './images/S__56541196_0.png',
         name: '片手上げポーズ3'
     },
     pose11: { 
-        width: 90,
-        height: 180,
+        width: isMobile ? 45 : 90,
+        height: isMobile ? 90 : 180,
         mass: 5, 
         imagePath: './images/S__56541199_0.png',
         name: 'ジャンプポーズ2'
     },
     pose12: { 
-        width: 90,
-        height: 180,
+        width: isMobile ? 45 : 90,
+        height: isMobile ? 90 : 180,
         mass: 5, 
         imagePath: './images/S__56541200_0.png',
         name: 'ジャンプポーズ3'
@@ -156,7 +157,7 @@ render.bounds = {
 // 地面と壁の作成
 const ground = Bodies.rectangle(
     CANVAS_WIDTH / 2,
-    CANVAS_HEIGHT - 260,  // プラットフォームの下に配置
+    CANVAS_HEIGHT - (isMobile ? MOBILE_BUTTON_HEIGHT + 20 : 260),  // モバイルの場合はボタンの上に配置
     CANVAS_WIDTH,
     GROUND_HEIGHT,
     { 
@@ -199,7 +200,7 @@ const rightWall = Bodies.rectangle(
 // プラットフォームの作成
 const platform = Bodies.rectangle(
     CANVAS_WIDTH / 2,
-    CANVAS_HEIGHT - 280,  // 回転ボタンの上に配置
+    CANVAS_HEIGHT - (isMobile ? MOBILE_BUTTON_HEIGHT + 40 : 280),  // モバイルの場合はボタンの上に配置
     PLATFORM_WIDTH,
     PLATFORM_HEIGHT,
     { 
@@ -654,67 +655,69 @@ document.addEventListener('keyup', function(event) {
 
 // タッチ操作の設定
 function setupMobileControls() {
-    // モバイルデバイスの場合のみ、カスタムコントロールを設定
     if (isMobile) {
-        // 操作ボタン用のコンテナ
+        // コントロールコンテナ
         const controlsContainer = document.createElement('div');
         controlsContainer.style.position = 'fixed';
-        controlsContainer.style.bottom = '180px';
-        controlsContainer.style.left = '50%';
-        controlsContainer.style.transform = 'translateX(-50%)';
-        controlsContainer.style.display = 'flex';
-        controlsContainer.style.gap = '20px';
-        controlsContainer.style.alignItems = 'center';
+        controlsContainer.style.bottom = '0';
+        controlsContainer.style.left = '0';
         controlsContainer.style.width = '100%';
-        controlsContainer.style.maxWidth = '500px';
-        controlsContainer.style.justifyContent = 'space-between';
-        controlsContainer.style.padding = '0 20px';
+        controlsContainer.style.height = `${MOBILE_BUTTON_HEIGHT}px`;
+        controlsContainer.style.display = 'flex';
+        controlsContainer.style.justifyContent = 'space-evenly';
+        controlsContainer.style.alignItems = 'center';
+        controlsContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
         controlsContainer.style.zIndex = '1000';
 
         // 左矢印ボタン
         const leftButton = document.createElement('button');
         leftButton.innerHTML = '←';
         leftButton.style.width = '60px';
-        leftButton.style.height = '60px';
+        leftButton.style.height = '50px';
         leftButton.style.fontSize = '24px';
         leftButton.style.backgroundColor = '#4CAF50';
         leftButton.style.border = 'none';
-        leftButton.style.borderRadius = '50%';
+        leftButton.style.borderRadius = '10px';
         leftButton.style.color = 'white';
         leftButton.style.cursor = 'pointer';
-        leftButton.style.zIndex = '1000';
 
         // 回転ボタン
         const rotateButton = document.createElement('button');
         rotateButton.innerHTML = '回転';
         rotateButton.style.width = '80px';
-        rotateButton.style.height = '60px';
+        rotateButton.style.height = '50px';
         rotateButton.style.fontSize = '18px';
         rotateButton.style.backgroundColor = '#2196F3';
         rotateButton.style.border = 'none';
         rotateButton.style.borderRadius = '10px';
         rotateButton.style.color = 'white';
         rotateButton.style.cursor = 'pointer';
-        rotateButton.style.position = 'absolute';
-        rotateButton.style.left = '50%';
-        rotateButton.style.transform = 'translateX(-50%)';
-        rotateButton.style.bottom = '100px';
-        rotateButton.style.zIndex = '1000';
+
+        // 次のポーズボタン
+        const nextPoseButton = document.createElement('button');
+        nextPoseButton.innerHTML = '次のポーズ';
+        nextPoseButton.style.width = '100px';
+        nextPoseButton.style.height = '50px';
+        nextPoseButton.style.fontSize = '16px';
+        nextPoseButton.style.backgroundColor = '#FF5722';
+        nextPoseButton.style.border = 'none';
+        nextPoseButton.style.borderRadius = '10px';
+        nextPoseButton.style.color = 'white';
+        nextPoseButton.style.cursor = 'pointer';
 
         // 右矢印ボタン
         const rightButton = document.createElement('button');
         rightButton.innerHTML = '→';
         rightButton.style.width = '60px';
-        rightButton.style.height = '60px';
+        rightButton.style.height = '50px';
         rightButton.style.fontSize = '24px';
         rightButton.style.backgroundColor = '#4CAF50';
         rightButton.style.border = 'none';
-        rightButton.style.borderRadius = '50%';
+        rightButton.style.borderRadius = '10px';
         rightButton.style.color = 'white';
         rightButton.style.cursor = 'pointer';
-        rightButton.style.zIndex = '1000';
 
-        // ボタンのイベントリスナー
+        // イベントリスナー
         leftButton.addEventListener('touchstart', () => { controlState.left = true; });
         leftButton.addEventListener('touchend', () => { controlState.left = false; });
 
@@ -730,16 +733,18 @@ function setupMobileControls() {
             }
         });
 
-        // スペースキーで新しいポーズを生成
-        document.addEventListener('touchstart', (e) => {
+        nextPoseButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
             if (!activeBody || activeBody.isLanded) {
                 createPose();
             }
         });
 
+        // ボタンをコンテナに追加
         controlsContainer.appendChild(leftButton);
+        controlsContainer.appendChild(rotateButton);
+        controlsContainer.appendChild(nextPoseButton);
         controlsContainer.appendChild(rightButton);
-        document.body.appendChild(rotateButton);
         document.body.appendChild(controlsContainer);
 
         // タッチイベントの無効化
