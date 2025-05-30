@@ -633,63 +633,25 @@ document.addEventListener('keyup', function(event) {
     }
 });
 
-// モバイルコントロールの設定
+// タッチ操作の設定
 function setupMobileControls() {
-    const buttons = {
-        up: document.getElementById('up-button'),
-        down: document.getElementById('down-button'),
-        left: document.getElementById('left-button'),
-        right: document.getElementById('right-button')
-    };
-
-    // タッチ状態を管理
-    let touchStates = {
-        up: false,
-        down: false,
-        left: false,
-        right: false
-    };
-
-    function handleTouchStart(direction, event) {
-        event.preventDefault();
-        touchStates[direction] = true;
-        controlState[direction] = true;
-        buttons[direction].style.transform = 'scale(0.95)';
-        buttons[direction].style.background = '#45a049';
-    }
-
-    function handleTouchEnd(direction, event) {
-        event.preventDefault();
-        touchStates[direction] = false;
-        controlState[direction] = false;
-        buttons[direction].style.transform = '';
-        buttons[direction].style.background = '';
-    }
-
-    // タッチイベントとマウスイベントの設定
-    Object.entries(buttons).forEach(([direction, button]) => {
-        // タッチイベント
-        button.addEventListener('touchstart', (e) => handleTouchStart(direction, e), { passive: false });
-        button.addEventListener('touchend', (e) => handleTouchEnd(direction, e), { passive: false });
-        button.addEventListener('touchcancel', (e) => handleTouchEnd(direction, e), { passive: false });
-
-        // マウスイベント（PCでのテスト用）
-        button.addEventListener('mousedown', (e) => handleTouchStart(direction, e));
-        button.addEventListener('mouseup', (e) => handleTouchEnd(direction, e));
-        button.addEventListener('mouseleave', (e) => handleTouchEnd(direction, e));
-    });
-
-    // 回転用のタッチイベント
+    let touchStartX = 0;
+    let touchStartY = 0;
+    const swipeThreshold = 30; // スワイプを検知する最小距離
     let lastTapTime = 0;
-    const doubleTapDelay = 300; // ミリ秒
+    const tapThreshold = 300; // タップ判定の時間閾値
 
+    // タッチ開始時の処理
     document.addEventListener('touchstart', function(event) {
+        event.preventDefault();
+        touchStartX = event.touches[0].clientX;
+        touchStartY = event.touches[0].clientY;
+
         const currentTime = new Date().getTime();
         const tapLength = currentTime - lastTapTime;
         
-        if (tapLength < doubleTapDelay && tapLength > 0) {
-            // ダブルタップを検出
-            event.preventDefault();
+        // シングルタップで回転
+        if (tapLength > tapThreshold) {
             if (activeBody && !activeBody.isLanded) {
                 const currentAngle = activeBody.angle;
                 Body.setAngle(activeBody, currentAngle + Math.PI/2);
@@ -697,6 +659,45 @@ function setupMobileControls() {
             }
         }
         lastTapTime = currentTime;
+    }, { passive: false });
+
+    // タッチ移動中の処理
+    document.addEventListener('touchmove', function(event) {
+        event.preventDefault();
+        if (!activeBody || !gameState.isPlaying || activeBody.isLanded) return;
+
+        const touchX = event.touches[0].clientX;
+        const touchY = event.touches[0].clientY;
+        const deltaX = touchX - touchStartX;
+        const deltaY = touchY - touchStartY;
+
+        // 左右のスワイプ
+        if (Math.abs(deltaX) > swipeThreshold) {
+            const velocityX = deltaX > 0 ? MOVE_SPEED : -MOVE_SPEED;
+            Body.setVelocity(activeBody, { 
+                x: velocityX, 
+                y: activeBody.velocity.y 
+            });
+        }
+
+        // 下向きスワイプで落下速度アップ
+        if (deltaY > swipeThreshold) {
+            Body.setVelocity(activeBody, { 
+                x: activeBody.velocity.x, 
+                y: MOVE_SPEED * 2 
+            });
+        }
+    }, { passive: false });
+
+    // タッチ終了時の処理
+    document.addEventListener('touchend', function(event) {
+        event.preventDefault();
+        if (activeBody && !activeBody.isLanded) {
+            Body.setVelocity(activeBody, { 
+                x: 0, 
+                y: activeBody.velocity.y 
+            });
+        }
     }, { passive: false });
 
     // 画面の向きが変わったときの処理
@@ -710,7 +711,28 @@ function setupMobileControls() {
             // レンダラーのサイズを更新
             render.canvas.width = canvas.width;
             render.canvas.height = canvas.height;
+            
+            // レンダラーのビューポートを更新
+            render.bounds = {
+                min: { x: 0, y: -cameraY },
+                max: { x: CANVAS_WIDTH, y: CANVAS_HEIGHT - cameraY }
+            };
         }, 100);
+    });
+
+    // リサイズ時の処理
+    window.addEventListener('resize', function() {
+        const canvas = document.getElementById('game-canvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        render.canvas.width = canvas.width;
+        render.canvas.height = canvas.height;
+        
+        render.bounds = {
+            min: { x: 0, y: -cameraY },
+            max: { x: CANVAS_WIDTH, y: CANVAS_HEIGHT - cameraY }
+        };
     });
 }
 
