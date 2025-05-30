@@ -5,11 +5,11 @@ const { Engine, Render, World, Bodies, Body, Events, Mouse, MouseConstraint, Que
 const DEBUG = true;
 
 // ゲーム設定
-const CANVAS_WIDTH = 800;
-const CANVAS_HEIGHT = 600;
+const CANVAS_WIDTH = 1200;  // 800から1200に拡大
+const CANVAS_HEIGHT = 900;  // 600から900に拡大
 const GROUND_HEIGHT = 60;
 const WALL_THICKNESS = 60;
-const PLATFORM_WIDTH = 300;
+const PLATFORM_WIDTH = 450;  // プラットフォームも1.5倍に拡大（300から450）
 const PLATFORM_HEIGHT = 20;
 const SPAWN_INTERVAL = 3000; // ミリ秒
 const MAX_BODIES = 30; // 最大物体数
@@ -30,85 +30,85 @@ let targetCameraY = 0;
 // ポーズの設定（画像パスを追加）
 const POSES = {
     pose1: { 
-        width: 60,  // 1.5倍に拡大
-        height: 120, // 1.5倍に拡大
+        width: 90,  // 1.5倍に拡大
+        height: 180, // 1.5倍に拡大
         mass: 5, 
         imagePath: './images/S__56541186_0.png',
         name: '両手上げポーズ1'
     },
     pose2: { 
-        width: 60, 
-        height: 120, 
+        width: 90, 
+        height: 180, 
         mass: 5, 
         imagePath: './images/S__56541188_0.png',
         name: '片手上げポーズ1'
     },
     pose3: { 
-        width: 60, 
-        height: 120, 
+        width: 90, 
+        height: 180, 
         mass: 5, 
         imagePath: './images/S__56541189_0.png',
         name: '両手上げポーズ2'
     },
     pose4: { 
-        width: 60, 
-        height: 120, 
+        width: 90, 
+        height: 180, 
         mass: 5, 
         imagePath: './images/S__56541190_0.png',
         name: 'バンザイポーズ'
     },
     pose5: { 
-        width: 60, 
-        height: 120, 
+        width: 90, 
+        height: 180, 
         mass: 5, 
         imagePath: './images/S__56541191_0.png',
         name: '両手広げポーズ'
     },
     pose6: { 
-        width: 60, 
-        height: 120, 
+        width: 90, 
+        height: 180, 
         mass: 5, 
         imagePath: './images/S__56541192_0.png',
         name: 'ジャンプポーズ1'
     },
     pose7: { 
-        width: 60, 
-        height: 120, 
+        width: 90, 
+        height: 180, 
         mass: 5, 
         imagePath: './images/S__56541193_0.png',
         name: '片手上げポーズ2'
     },
     pose8: { 
-        width: 60, 
-        height: 120, 
+        width: 90, 
+        height: 180, 
         mass: 5, 
         imagePath: './images/S__56541194_0.png',
         name: '両手広げポーズ2'
     },
     pose9: { 
-        width: 60, 
-        height: 120, 
+        width: 90, 
+        height: 180, 
         mass: 5, 
         imagePath: './images/S__56541195_0.png',
         name: '横向きポーズ1'
     },
     pose10: { 
-        width: 60, 
-        height: 120, 
+        width: 90, 
+        height: 180, 
         mass: 5, 
         imagePath: './images/S__56541196_0.png',
         name: '片手上げポーズ3'
     },
     pose11: { 
-        width: 60, 
-        height: 120, 
+        width: 90, 
+        height: 180, 
         mass: 5, 
         imagePath: './images/S__56541199_0.png',
         name: 'ジャンプポーズ2'
     },
     pose12: { 
-        width: 60, 
-        height: 120, 
+        width: 90, 
+        height: 180, 
         mass: 5, 
         imagePath: './images/S__56541200_0.png',
         name: 'ジャンプポーズ3'
@@ -635,105 +635,91 @@ document.addEventListener('keyup', function(event) {
 
 // タッチ操作の設定
 function setupMobileControls() {
-    let touchStartX = 0;
-    let touchStartY = 0;
-    const swipeThreshold = 30; // スワイプを検知する最小距離
-    let lastTapTime = 0;
-    const tapThreshold = 300; // タップ判定の時間閾値
+    const controlsContainer = document.createElement('div');
+    controlsContainer.style.position = 'fixed';
+    controlsContainer.style.bottom = '20px';
+    controlsContainer.style.left = '50%';
+    controlsContainer.style.transform = 'translateX(-50%)';
+    controlsContainer.style.display = 'flex';
+    controlsContainer.style.gap = '20px';
+    controlsContainer.style.alignItems = 'center';
 
-    // タッチ開始時の処理
-    document.addEventListener('touchstart', function(event) {
-        event.preventDefault();
-        touchStartX = event.touches[0].clientX;
-        touchStartY = event.touches[0].clientY;
+    // 左矢印ボタン
+    const leftButton = document.createElement('button');
+    leftButton.innerHTML = '←';
+    leftButton.style.width = '60px';
+    leftButton.style.height = '60px';
+    leftButton.style.fontSize = '24px';
+    leftButton.style.backgroundColor = '#4CAF50';
+    leftButton.style.border = 'none';
+    leftButton.style.borderRadius = '50%';
+    leftButton.style.color = 'white';
+    leftButton.style.cursor = 'pointer';
 
-        const currentTime = new Date().getTime();
-        const tapLength = currentTime - lastTapTime;
-        
-        // シングルタップで回転
-        if (tapLength > tapThreshold) {
-            if (activeBody && !activeBody.isLanded) {
-                const currentAngle = activeBody.angle;
-                Body.setAngle(activeBody, currentAngle + Math.PI/2);
-                Body.setAngularVelocity(activeBody, 0);
-            }
+    // 回転ボタン
+    const rotateButton = document.createElement('button');
+    rotateButton.innerHTML = '回転';
+    rotateButton.style.width = '80px';
+    rotateButton.style.height = '60px';
+    rotateButton.style.fontSize = '18px';
+    rotateButton.style.backgroundColor = '#2196F3';
+    rotateButton.style.border = 'none';
+    rotateButton.style.borderRadius = '10px';
+    rotateButton.style.color = 'white';
+    rotateButton.style.cursor = 'pointer';
+
+    // 右矢印ボタン
+    const rightButton = document.createElement('button');
+    rightButton.innerHTML = '→';
+    rightButton.style.width = '60px';
+    rightButton.style.height = '60px';
+    rightButton.style.fontSize = '24px';
+    rightButton.style.backgroundColor = '#4CAF50';
+    rightButton.style.border = 'none';
+    rightButton.style.borderRadius = '50%';
+    rightButton.style.color = 'white';
+    rightButton.style.cursor = 'pointer';
+
+    // ボタンのイベントリスナー
+    leftButton.addEventListener('touchstart', () => { controlState.left = true; });
+    leftButton.addEventListener('touchend', () => { controlState.left = false; });
+    leftButton.addEventListener('mousedown', () => { controlState.left = true; });
+    leftButton.addEventListener('mouseup', () => { controlState.left = false; });
+
+    rightButton.addEventListener('touchstart', () => { controlState.right = true; });
+    rightButton.addEventListener('touchend', () => { controlState.right = false; });
+    rightButton.addEventListener('mousedown', () => { controlState.right = true; });
+    rightButton.addEventListener('mouseup', () => { controlState.right = false; });
+
+    rotateButton.addEventListener('click', () => {
+        if (activeBody) {
+            Body.rotate(activeBody, Math.PI / 2);
         }
-        lastTapTime = currentTime;
-    }, { passive: false });
-
-    // タッチ移動中の処理
-    document.addEventListener('touchmove', function(event) {
-        event.preventDefault();
-        if (!activeBody || !gameState.isPlaying || activeBody.isLanded) return;
-
-        const touchX = event.touches[0].clientX;
-        const touchY = event.touches[0].clientY;
-        const deltaX = touchX - touchStartX;
-        const deltaY = touchY - touchStartY;
-
-        // 左右のスワイプ
-        if (Math.abs(deltaX) > swipeThreshold) {
-            const velocityX = deltaX > 0 ? MOVE_SPEED : -MOVE_SPEED;
-            Body.setVelocity(activeBody, { 
-                x: velocityX, 
-                y: activeBody.velocity.y 
-            });
+    });
+    rotateButton.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (activeBody) {
+            Body.rotate(activeBody, Math.PI / 2);
         }
-
-        // 下向きスワイプで落下速度アップ
-        if (deltaY > swipeThreshold) {
-            Body.setVelocity(activeBody, { 
-                x: activeBody.velocity.x, 
-                y: MOVE_SPEED * 2 
-            });
-        }
-    }, { passive: false });
-
-    // タッチ終了時の処理
-    document.addEventListener('touchend', function(event) {
-        event.preventDefault();
-        if (activeBody && !activeBody.isLanded) {
-            Body.setVelocity(activeBody, { 
-                x: 0, 
-                y: activeBody.velocity.y 
-            });
-        }
-    }, { passive: false });
-
-    // 画面の向きが変わったときの処理
-    window.addEventListener('orientationchange', function() {
-        setTimeout(function() {
-            // キャンバスのサイズを更新
-            const canvas = document.getElementById('game-canvas');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            
-            // レンダラーのサイズを更新
-            render.canvas.width = canvas.width;
-            render.canvas.height = canvas.height;
-            
-            // レンダラーのビューポートを更新
-            render.bounds = {
-                min: { x: 0, y: -cameraY },
-                max: { x: CANVAS_WIDTH, y: CANVAS_HEIGHT - cameraY }
-            };
-        }, 100);
     });
 
-    // リサイズ時の処理
-    window.addEventListener('resize', function() {
-        const canvas = document.getElementById('game-canvas');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        
-        render.canvas.width = canvas.width;
-        render.canvas.height = canvas.height;
-        
-        render.bounds = {
-            min: { x: 0, y: -cameraY },
-            max: { x: CANVAS_WIDTH, y: CANVAS_HEIGHT - cameraY }
-        };
-    });
+    controlsContainer.appendChild(leftButton);
+    controlsContainer.appendChild(rotateButton);
+    controlsContainer.appendChild(rightButton);
+    document.body.appendChild(controlsContainer);
+
+    // タッチイベントの無効化（スワイプ操作を削除）
+    render.canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+    }, { passive: false });
+
+    render.canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+    }, { passive: false });
+
+    render.canvas.addEventListener('touchend', (e) => {
+        e.preventDefault();
+    }, { passive: false });
 }
 
 // 画像の読み込み
