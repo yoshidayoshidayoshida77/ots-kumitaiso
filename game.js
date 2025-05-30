@@ -156,7 +156,7 @@ render.bounds = {
 // 地面と壁の作成
 const ground = Bodies.rectangle(
     CANVAS_WIDTH / 2,
-    CANVAS_HEIGHT - 130,  // 地面の位置も調整
+    CANVAS_HEIGHT - 260,  // プラットフォームの下に配置
     CANVAS_WIDTH,
     GROUND_HEIGHT,
     { 
@@ -199,7 +199,7 @@ const rightWall = Bodies.rectangle(
 // プラットフォームの作成
 const platform = Bodies.rectangle(
     CANVAS_WIDTH / 2,
-    CANVAS_HEIGHT - 150,  // 土台の位置を上に移動
+    CANVAS_HEIGHT - 280,  // 回転ボタンの上に配置
     PLATFORM_WIDTH,
     PLATFORM_HEIGHT,
     { 
@@ -631,12 +631,6 @@ document.addEventListener('keydown', function(event) {
                 createPose();
             }
             break;
-        case 'ArrowUp':
-            controlState.up = true;
-            break;
-        case 'ArrowDown':
-            controlState.down = true;
-            break;
         case 'ArrowLeft':
             controlState.left = true;
             break;
@@ -649,12 +643,6 @@ document.addEventListener('keydown', function(event) {
 document.addEventListener('keyup', function(event) {
     if (!gameState.isPlaying) return;
     switch(event.code) {
-        case 'ArrowUp':
-            controlState.up = false;
-            break;
-        case 'ArrowDown':
-            controlState.down = false;
-            break;
         case 'ArrowLeft':
             controlState.left = false;
             break;
@@ -671,7 +659,7 @@ function setupMobileControls() {
         // 操作ボタン用のコンテナ
         const controlsContainer = document.createElement('div');
         controlsContainer.style.position = 'fixed';
-        controlsContainer.style.bottom = '180px';  // ボタンの位置を土台の上に移動
+        controlsContainer.style.bottom = '180px';
         controlsContainer.style.left = '50%';
         controlsContainer.style.transform = 'translateX(-50%)';
         controlsContainer.style.display = 'flex';
@@ -710,7 +698,7 @@ function setupMobileControls() {
         rotateButton.style.position = 'absolute';
         rotateButton.style.left = '50%';
         rotateButton.style.transform = 'translateX(-50%)';
-        rotateButton.style.bottom = '260px';  // 回転ボタンの位置も調整
+        rotateButton.style.bottom = '100px';
         rotateButton.style.zIndex = '1000';
 
         // 右矢印ボタン
@@ -726,23 +714,6 @@ function setupMobileControls() {
         rightButton.style.cursor = 'pointer';
         rightButton.style.zIndex = '1000';
 
-        // 次のポーズボタン
-        const nextPoseButton = document.createElement('button');
-        nextPoseButton.innerHTML = '次のポーズ';
-        nextPoseButton.style.width = '120px';
-        nextPoseButton.style.height = '60px';
-        nextPoseButton.style.fontSize = '16px';
-        nextPoseButton.style.backgroundColor = '#FF5722';
-        nextPoseButton.style.border = 'none';
-        nextPoseButton.style.borderRadius = '10px';
-        nextPoseButton.style.color = 'white';
-        nextPoseButton.style.cursor = 'pointer';
-        nextPoseButton.style.position = 'fixed';  // positionをfixedに変更
-        nextPoseButton.style.left = '50%';
-        nextPoseButton.style.transform = 'translateX(-50%)';
-        nextPoseButton.style.bottom = '100px';  // 次のポーズボタンの位置も調整
-        nextPoseButton.style.zIndex = '1000';
-
         // ボタンのイベントリスナー
         leftButton.addEventListener('touchstart', () => { controlState.left = true; });
         leftButton.addEventListener('touchend', () => { controlState.left = false; });
@@ -757,15 +728,9 @@ function setupMobileControls() {
             }
         });
 
-        nextPoseButton.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            createPose();
-        });
-
         controlsContainer.appendChild(leftButton);
         controlsContainer.appendChild(rightButton);
         document.body.appendChild(rotateButton);
-        document.body.appendChild(nextPoseButton);
         document.body.appendChild(controlsContainer);
 
         // タッチイベントの無効化
