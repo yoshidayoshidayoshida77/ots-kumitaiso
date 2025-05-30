@@ -8,11 +8,11 @@ const DEBUG = true;
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
 // ゲーム設定
-const CANVAS_WIDTH = isMobile ? window.innerWidth * 0.95 : 800;  // モバイルの場合は画面幅の95%、PCは800px
-const CANVAS_HEIGHT = isMobile ? window.innerHeight * 0.8 : 600; // モバイルの場合は画面高さの80%、PCは600px
+const CANVAS_WIDTH = 800;  // PCの画面サイズを固定
+const CANVAS_HEIGHT = 600; // PCの画面サイズを固定
 const GROUND_HEIGHT = 60;
 const WALL_THICKNESS = 60;
-const PLATFORM_WIDTH = isMobile ? CANVAS_WIDTH * 0.4 : 300;  // モバイルの場合はキャンバス幅の40%、PCは300px
+const PLATFORM_WIDTH = 300;  // プラットフォームの幅を固定
 const PLATFORM_HEIGHT = 20;
 const SPAWN_INTERVAL = 3000; // ミリ秒
 const MAX_BODIES = 30; // 最大物体数
@@ -466,6 +466,17 @@ function endGame(result) {
     // アクティブなポーズをクリア
     activeBody = null;
     
+    // モバイルコントロールを非表示
+    if (isMobile) {
+        const controls = document.querySelectorAll('button');
+        controls.forEach(button => {
+            if (button.innerHTML === '←' || button.innerHTML === '→' || 
+                button.innerHTML === '回転' || button.innerHTML === '次のポーズ') {
+                button.style.display = 'none';
+            }
+        });
+    }
+    
     // ゲームオーバー画面を表示
     document.getElementById('game-over-screen').style.display = 'block';
     document.getElementById('final-height').textContent = gameState.peopleCount;
@@ -564,6 +575,17 @@ function restartGame() {
     
     // ゲームオーバー画面を非表示
     document.getElementById('game-over-screen').style.display = 'none';
+    
+    // モバイルコントロールを再表示
+    if (isMobile) {
+        const controls = document.querySelectorAll('button');
+        controls.forEach(button => {
+            if (button.innerHTML === '←' || button.innerHTML === '→' || 
+                button.innerHTML === '回転' || button.innerHTML === '次のポーズ') {
+                button.style.display = 'block';
+            }
+        });
+    }
     
     // ゲーム開始
     startGame();
@@ -740,7 +762,7 @@ function setupMobileControls() {
         document.body.appendChild(nextPoseButton);
         document.body.appendChild(controlsContainer);
 
-        // タッチイベントの無効化（スワイプ操作を削除）
+        // タッチイベントの無効化
         render.canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
         }, { passive: false });
