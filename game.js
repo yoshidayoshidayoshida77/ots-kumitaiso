@@ -157,7 +157,7 @@ render.bounds = {
 // 地面と壁の作成
 const ground = Bodies.rectangle(
     CANVAS_WIDTH / 2,
-    CANVAS_HEIGHT - (isMobile ? MOBILE_BUTTON_HEIGHT + 20 : 260),  // モバイルの場合はボタンの上に配置
+    CANVAS_HEIGHT - (isMobile ? 140 : 260),  // モバイルの場合はボタンの上に配置
     CANVAS_WIDTH,
     GROUND_HEIGHT,
     { 
@@ -200,7 +200,7 @@ const rightWall = Bodies.rectangle(
 // プラットフォームの作成
 const platform = Bodies.rectangle(
     CANVAS_WIDTH / 2,
-    CANVAS_HEIGHT - (isMobile ? MOBILE_BUTTON_HEIGHT + 40 : 280),  // モバイルの場合はボタンの上に配置
+    CANVAS_HEIGHT - (isMobile ? 160 : 280),  // モバイルの場合はボタンの上に配置
     PLATFORM_WIDTH,
     PLATFORM_HEIGHT,
     { 
@@ -662,88 +662,108 @@ function setupMobileControls() {
         controlsContainer.style.bottom = '0';
         controlsContainer.style.left = '0';
         controlsContainer.style.width = '100%';
-        controlsContainer.style.height = `${MOBILE_BUTTON_HEIGHT}px`;
-        controlsContainer.style.display = 'flex';
-        controlsContainer.style.justifyContent = 'space-evenly';
-        controlsContainer.style.alignItems = 'center';
-        controlsContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+        controlsContainer.style.padding = '20px';
+        controlsContainer.style.backgroundColor = '#f0f0f0';
+        controlsContainer.style.display = 'grid';
+        controlsContainer.style.gridTemplateColumns = 'repeat(4, 1fr)';
+        controlsContainer.style.gap = '10px';
         controlsContainer.style.zIndex = '1000';
 
         // 左矢印ボタン
         const leftButton = document.createElement('button');
         leftButton.innerHTML = '←';
-        leftButton.style.width = '60px';
+        leftButton.style.width = '100%';
         leftButton.style.height = '50px';
         leftButton.style.fontSize = '24px';
-        leftButton.style.backgroundColor = '#4CAF50';
-        leftButton.style.border = 'none';
-        leftButton.style.borderRadius = '10px';
-        leftButton.style.color = 'white';
+        leftButton.style.backgroundColor = '#e0e0e0';
+        leftButton.style.border = '2px solid #ccc';
+        leftButton.style.borderRadius = '8px';
+        leftButton.style.color = '#333';
         leftButton.style.cursor = 'pointer';
-
-        // 回転ボタン
-        const rotateButton = document.createElement('button');
-        rotateButton.innerHTML = '回転';
-        rotateButton.style.width = '80px';
-        rotateButton.style.height = '50px';
-        rotateButton.style.fontSize = '18px';
-        rotateButton.style.backgroundColor = '#2196F3';
-        rotateButton.style.border = 'none';
-        rotateButton.style.borderRadius = '10px';
-        rotateButton.style.color = 'white';
-        rotateButton.style.cursor = 'pointer';
 
         // 次のポーズボタン
         const nextPoseButton = document.createElement('button');
         nextPoseButton.innerHTML = '次のポーズ';
-        nextPoseButton.style.width = '100px';
+        nextPoseButton.style.width = '100%';
         nextPoseButton.style.height = '50px';
         nextPoseButton.style.fontSize = '16px';
-        nextPoseButton.style.backgroundColor = '#FF5722';
-        nextPoseButton.style.border = 'none';
-        nextPoseButton.style.borderRadius = '10px';
-        nextPoseButton.style.color = 'white';
+        nextPoseButton.style.backgroundColor = '#e0e0e0';
+        nextPoseButton.style.border = '2px solid #ccc';
+        nextPoseButton.style.borderRadius = '8px';
+        nextPoseButton.style.color = '#333';
         nextPoseButton.style.cursor = 'pointer';
+
+        // 回転ボタン
+        const rotateButton = document.createElement('button');
+        rotateButton.innerHTML = '回転';
+        rotateButton.style.width = '100%';
+        rotateButton.style.height = '50px';
+        rotateButton.style.fontSize = '16px';
+        rotateButton.style.backgroundColor = '#e0e0e0';
+        rotateButton.style.border = '2px solid #ccc';
+        rotateButton.style.borderRadius = '8px';
+        rotateButton.style.color = '#333';
+        rotateButton.style.cursor = 'pointer';
 
         // 右矢印ボタン
         const rightButton = document.createElement('button');
         rightButton.innerHTML = '→';
-        rightButton.style.width = '60px';
+        rightButton.style.width = '100%';
         rightButton.style.height = '50px';
         rightButton.style.fontSize = '24px';
-        rightButton.style.backgroundColor = '#4CAF50';
-        rightButton.style.border = 'none';
-        rightButton.style.borderRadius = '10px';
-        rightButton.style.color = 'white';
+        rightButton.style.backgroundColor = '#e0e0e0';
+        rightButton.style.border = '2px solid #ccc';
+        rightButton.style.borderRadius = '8px';
+        rightButton.style.color = '#333';
         rightButton.style.cursor = 'pointer';
 
         // イベントリスナー
-        leftButton.addEventListener('touchstart', () => { controlState.left = true; });
-        leftButton.addEventListener('touchend', () => { controlState.left = false; });
+        leftButton.addEventListener('touchstart', () => { 
+            controlState.left = true;
+            leftButton.style.backgroundColor = '#ccc';
+        });
+        leftButton.addEventListener('touchend', () => { 
+            controlState.left = false;
+            leftButton.style.backgroundColor = '#e0e0e0';
+        });
 
-        rightButton.addEventListener('touchstart', () => { controlState.right = true; });
-        rightButton.addEventListener('touchend', () => { controlState.right = false; });
+        rightButton.addEventListener('touchstart', () => { 
+            controlState.right = true;
+            rightButton.style.backgroundColor = '#ccc';
+        });
+        rightButton.addEventListener('touchend', () => { 
+            controlState.right = false;
+            rightButton.style.backgroundColor = '#e0e0e0';
+        });
 
         rotateButton.addEventListener('touchstart', (e) => {
             e.preventDefault();
+            rotateButton.style.backgroundColor = '#ccc';
             if (activeBody && !activeBody.isLanded) {
                 const currentAngle = activeBody.angle;
                 Body.setAngle(activeBody, currentAngle + Math.PI/2);
                 Body.setAngularVelocity(activeBody, 0);
             }
         });
+        rotateButton.addEventListener('touchend', () => {
+            rotateButton.style.backgroundColor = '#e0e0e0';
+        });
 
         nextPoseButton.addEventListener('touchstart', (e) => {
             e.preventDefault();
+            nextPoseButton.style.backgroundColor = '#ccc';
             if (!activeBody || activeBody.isLanded) {
                 createPose();
             }
         });
+        nextPoseButton.addEventListener('touchend', () => {
+            nextPoseButton.style.backgroundColor = '#e0e0e0';
+        });
 
         // ボタンをコンテナに追加
         controlsContainer.appendChild(leftButton);
-        controlsContainer.appendChild(rotateButton);
         controlsContainer.appendChild(nextPoseButton);
+        controlsContainer.appendChild(rotateButton);
         controlsContainer.appendChild(rightButton);
         document.body.appendChild(controlsContainer);
 
