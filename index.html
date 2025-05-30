@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>OTS組体操</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <style>
@@ -14,12 +14,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            touch-action: none;
         }
         #game-canvas {
             border: 2px solid #333;
             margin-top: 10px;
-            touch-action: none;
         }
         #ui-container {
             position: fixed;
@@ -28,7 +26,6 @@
             background: rgba(255, 255, 255, 0.8);
             padding: 10px;
             border-radius: 5px;
-            z-index: 100;
         }
         #start-screen {
             position: fixed;
@@ -39,9 +36,6 @@
             padding: 20px;
             border-radius: 10px;
             text-align: center;
-            z-index: 1000;
-            width: 80%;
-            max-width: 400px;
         }
         #game-over-screen {
             display: none;
@@ -53,9 +47,6 @@
             padding: 20px;
             border-radius: 10px;
             text-align: center;
-            z-index: 1000;
-            width: 80%;
-            max-width: 400px;
         }
         #loading-screen {
             position: fixed;
@@ -73,7 +64,7 @@
         }
         #mobile-controls {
             position: fixed;
-            bottom: 100px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             display: grid;
@@ -81,18 +72,17 @@
                 ". up ."
                 "left . right"
                 ". down .";
-            gap: 15px;
-            background: rgba(255, 255, 255, 0.5);
-            padding: 15px;
-            border-radius: 15px;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 10px;
             touch-action: none;
-            z-index: 100;
         }
         .control-button {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             border: none;
-            border-radius: 30px;
+            border-radius: 25px;
             background: #4CAF50;
             color: white;
             font-size: 24px;
@@ -102,63 +92,18 @@
             justify-content: center;
             touch-action: none;
             user-select: none;
-            -webkit-user-select: none;
-            -webkit-tap-highlight-color: transparent;
         }
         .control-button:active {
             background: #45a049;
-            transform: scale(0.95);
         }
         #up-button { grid-area: up; }
         #left-button { grid-area: left; }
         #right-button { grid-area: right; }
         #down-button { grid-area: down; }
-
-        #next-pose-button {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 100;
-        }
-        
-        .next-pose-btn {
-            background: #FF6B6B;
-            border: none;
-            border-radius: 30px;
-            color: white;
-            padding: 15px 30px;
-            font-size: 18px;
-            touch-action: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .next-pose-btn:active {
-            transform: scale(0.95);
-            background: #FF5252;
-        }
-
         @media (min-width: 1024px) {
             #mobile-controls {
                 display: none;
             }
-        }
-
-        .animal-button {
-            background: #4CAF50;
-            border: none;
-            border-radius: 5px;
-            color: white;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 5px;
-            touch-action: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .animal-button:active {
-            transform: scale(0.95);
         }
     </style>
 </head>
@@ -179,7 +124,7 @@
         <h2>組体操完成！</h2>
         <p>積み上げ人数: <span id="final-height">0</span>人</p>
         <p>経過時間: <span id="final-time">0</span>秒</p>
-        <button onclick="restartGame()" class="animal-button">もう一度遊ぶ</button>
+        <button onclick="restartGame()" class="animal-button">もう一度チャレンジ</button>
     </div>
     <div id="mobile-controls">
         <button id="up-button" class="control-button">↑</button>
@@ -187,12 +132,28 @@
         <button id="right-button" class="control-button">→</button>
         <button id="down-button" class="control-button">↓</button>
     </div>
-    <div id="next-pose-button">
-        <button onclick="createPose()" class="next-pose-btn">
+    <div id="next-pose-button" style="
+        position: fixed;
+        bottom: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(255, 255, 255, 0.8);
+        padding: 10px;
+        border-radius: 10px;
+        text-align: center;
+        z-index: 1000;
+    ">
+        <button onclick="createPose()" class="control-button" style="
+            background: #FF6B6B;
+            width: auto;
+            padding: 0 20px;
+            white-space: nowrap;
+            font-size: 18px;
+        ">
             次のポーズ
         </button>
     </div>
     <canvas id="game-canvas"></canvas>
     <script src="game.js"></script>
 </body>
-</html>
+</html> 
