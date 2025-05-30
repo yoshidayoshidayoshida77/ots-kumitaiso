@@ -33,84 +33,84 @@ const POSES = {
         width: 60,  // 1.5倍に拡大
         height: 120, // 1.5倍に拡大
         mass: 5, 
-        imagePath: '/ots-kumitaiso/images/S__56541186_0.png',
+        imagePath: './images/S__56541186_0.png',
         name: '両手上げポーズ1'
     },
     pose2: { 
         width: 60, 
         height: 120, 
         mass: 5, 
-        imagePath: '/ots-kumitaiso/images/S__56541188_0.png',
+        imagePath: './images/S__56541188_0.png',
         name: '片手上げポーズ1'
     },
     pose3: { 
         width: 60, 
         height: 120, 
         mass: 5, 
-        imagePath: '/ots-kumitaiso/images/S__56541189_0.png',
+        imagePath: './images/S__56541189_0.png',
         name: '両手上げポーズ2'
     },
     pose4: { 
         width: 60, 
         height: 120, 
         mass: 5, 
-        imagePath: '/ots-kumitaiso/images/S__56541190_0.png',
+        imagePath: './images/S__56541190_0.png',
         name: 'バンザイポーズ'
     },
     pose5: { 
         width: 60, 
         height: 120, 
         mass: 5, 
-        imagePath: '/ots-kumitaiso/images/S__56541191_0.png',
+        imagePath: './images/S__56541191_0.png',
         name: '両手広げポーズ'
     },
     pose6: { 
         width: 60, 
         height: 120, 
         mass: 5, 
-        imagePath: '/ots-kumitaiso/images/S__56541192_0.png',
+        imagePath: './images/S__56541192_0.png',
         name: 'ジャンプポーズ1'
     },
     pose7: { 
         width: 60, 
         height: 120, 
         mass: 5, 
-        imagePath: '/ots-kumitaiso/images/S__56541193_0.png',
+        imagePath: './images/S__56541193_0.png',
         name: '片手上げポーズ2'
     },
     pose8: { 
         width: 60, 
         height: 120, 
         mass: 5, 
-        imagePath: '/ots-kumitaiso/images/S__56541194_0.png',
+        imagePath: './images/S__56541194_0.png',
         name: '両手広げポーズ2'
     },
     pose9: { 
         width: 60, 
         height: 120, 
         mass: 5, 
-        imagePath: '/ots-kumitaiso/images/S__56541195_0.png',
+        imagePath: './images/S__56541195_0.png',
         name: '横向きポーズ1'
     },
     pose10: { 
         width: 60, 
         height: 120, 
         mass: 5, 
-        imagePath: '/ots-kumitaiso/images/S__56541196_0.png',
+        imagePath: './images/S__56541196_0.png',
         name: '片手上げポーズ3'
     },
     pose11: { 
         width: 60, 
         height: 120, 
         mass: 5, 
-        imagePath: '/ots-kumitaiso/images/S__56541199_0.png',
+        imagePath: './images/S__56541199_0.png',
         name: 'ジャンプポーズ2'
     },
     pose12: { 
         width: 60, 
         height: 120, 
         mass: 5, 
-        imagePath: '/ots-kumitaiso/images/S__56541200_0.png',
+        imagePath: './images/S__56541200_0.png',
         name: 'ジャンプポーズ3'
     }
 };
@@ -642,66 +642,77 @@ function setupMobileControls() {
         right: document.getElementById('right-button')
     };
 
+    // タッチ状態を管理
+    let touchStates = {
+        up: false,
+        down: false,
+        left: false,
+        right: false
+    };
+
     function handleTouchStart(direction, event) {
         event.preventDefault();
+        touchStates[direction] = true;
         controlState[direction] = true;
+        buttons[direction].style.transform = 'scale(0.95)';
+        buttons[direction].style.background = '#45a049';
     }
 
     function handleTouchEnd(direction, event) {
         event.preventDefault();
+        touchStates[direction] = false;
         controlState[direction] = false;
+        buttons[direction].style.transform = '';
+        buttons[direction].style.background = '';
     }
 
     // タッチイベントとマウスイベントの設定
     Object.entries(buttons).forEach(([direction, button]) => {
         // タッチイベント
-        button.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            handleTouchStart(direction, e);
-        }, { passive: false });
-        
-        button.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            handleTouchEnd(direction, e);
-        }, { passive: false });
-        
-        button.addEventListener('touchcancel', (e) => {
-            e.preventDefault();
-            handleTouchEnd(direction, e);
-        }, { passive: false });
+        button.addEventListener('touchstart', (e) => handleTouchStart(direction, e), { passive: false });
+        button.addEventListener('touchend', (e) => handleTouchEnd(direction, e), { passive: false });
+        button.addEventListener('touchcancel', (e) => handleTouchEnd(direction, e), { passive: false });
 
         // マウスイベント（PCでのテスト用）
-        button.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            handleTouchStart(direction, e);
-        });
-        
-        button.addEventListener('mouseup', (e) => {
-            e.preventDefault();
-            handleTouchEnd(direction, e);
-        });
-        
-        button.addEventListener('mouseleave', (e) => {
-            e.preventDefault();
-            handleTouchEnd(direction, e);
-        });
+        button.addEventListener('mousedown', (e) => handleTouchStart(direction, e));
+        button.addEventListener('mouseup', (e) => handleTouchEnd(direction, e));
+        button.addEventListener('mouseleave', (e) => handleTouchEnd(direction, e));
     });
 
     // 回転用のタッチイベント
-    document.addEventListener('touchstart', function(event) {
-        if (event.touches.length === 2 && activeBody && !activeBody.isLanded) {
-            event.preventDefault();
-            const currentAngle = activeBody.angle;
-            Body.setAngle(activeBody, currentAngle + Math.PI/2);
-            Body.setAngularVelocity(activeBody, 0);
-        }
-    }, { passive: false });
-}
+    let lastTapTime = 0;
+    const doubleTapDelay = 300; // ミリ秒
 
-// ゲーム開始時にモバイルコントロールを設定
-document.addEventListener('DOMContentLoaded', function() {
-    setupMobileControls();
-});
+    document.addEventListener('touchstart', function(event) {
+        const currentTime = new Date().getTime();
+        const tapLength = currentTime - lastTapTime;
+        
+        if (tapLength < doubleTapDelay && tapLength > 0) {
+            // ダブルタップを検出
+            event.preventDefault();
+            if (activeBody && !activeBody.isLanded) {
+                const currentAngle = activeBody.angle;
+                Body.setAngle(activeBody, currentAngle + Math.PI/2);
+                Body.setAngularVelocity(activeBody, 0);
+            }
+        }
+        lastTapTime = currentTime;
+    }, { passive: false });
+
+    // 画面の向きが変わったときの処理
+    window.addEventListener('orientationchange', function() {
+        setTimeout(function() {
+            // キャンバスのサイズを更新
+            const canvas = document.getElementById('game-canvas');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // レンダラーのサイズを更新
+            render.canvas.width = canvas.width;
+            render.canvas.height = canvas.height;
+        }, 100);
+    });
+}
 
 // 画像の読み込み
 function loadImages() {
@@ -793,4 +804,4 @@ function createPose() {
     activeBody = body;
     World.add(world, body);
     if (DEBUG) console.log('New pose created and active');
-}  
+} 
