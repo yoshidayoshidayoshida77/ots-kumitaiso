@@ -33,85 +33,85 @@ let targetCameraY = 0;
 // ポーズの設定（画像パスを追加）
 const POSES = {
     pose1: { 
-        width: 90,  // 1.5倍に拡大
-        height: 180, // 1.5倍に拡大
+        width: isMobile ? 60 : 90,  // モバイルの場合は小さく
+        height: isMobile ? 120 : 180, 
         mass: 5, 
         imagePath: './images/S__56541186_0.png',
         name: '両手上げポーズ1'
     },
     pose2: { 
-        width: 90, 
-        height: 180, 
+        width: isMobile ? 60 : 90,
+        height: isMobile ? 120 : 180,
         mass: 5, 
         imagePath: './images/S__56541188_0.png',
         name: '片手上げポーズ1'
     },
     pose3: { 
-        width: 90, 
-        height: 180, 
+        width: isMobile ? 60 : 90,
+        height: isMobile ? 120 : 180,
         mass: 5, 
         imagePath: './images/S__56541189_0.png',
         name: '両手上げポーズ2'
     },
     pose4: { 
-        width: 90, 
-        height: 180, 
+        width: isMobile ? 60 : 90,
+        height: isMobile ? 120 : 180,
         mass: 5, 
         imagePath: './images/S__56541190_0.png',
         name: 'バンザイポーズ'
     },
     pose5: { 
-        width: 90, 
-        height: 180, 
+        width: isMobile ? 60 : 90,
+        height: isMobile ? 120 : 180,
         mass: 5, 
         imagePath: './images/S__56541191_0.png',
         name: '両手広げポーズ'
     },
     pose6: { 
-        width: 90, 
-        height: 180, 
+        width: isMobile ? 60 : 90,
+        height: isMobile ? 120 : 180,
         mass: 5, 
         imagePath: './images/S__56541192_0.png',
         name: 'ジャンプポーズ1'
     },
     pose7: { 
-        width: 90, 
-        height: 180, 
+        width: isMobile ? 60 : 90,
+        height: isMobile ? 120 : 180,
         mass: 5, 
         imagePath: './images/S__56541193_0.png',
         name: '片手上げポーズ2'
     },
     pose8: { 
-        width: 90, 
-        height: 180, 
+        width: isMobile ? 60 : 90,
+        height: isMobile ? 120 : 180,
         mass: 5, 
         imagePath: './images/S__56541194_0.png',
         name: '両手広げポーズ2'
     },
     pose9: { 
-        width: 90, 
-        height: 180, 
+        width: isMobile ? 60 : 90,
+        height: isMobile ? 120 : 180,
         mass: 5, 
         imagePath: './images/S__56541195_0.png',
         name: '横向きポーズ1'
     },
     pose10: { 
-        width: 90, 
-        height: 180, 
+        width: isMobile ? 60 : 90,
+        height: isMobile ? 120 : 180,
         mass: 5, 
         imagePath: './images/S__56541196_0.png',
         name: '片手上げポーズ3'
     },
     pose11: { 
-        width: 90, 
-        height: 180, 
+        width: isMobile ? 60 : 90,
+        height: isMobile ? 120 : 180,
         mass: 5, 
         imagePath: './images/S__56541199_0.png',
         name: 'ジャンプポーズ2'
     },
     pose12: { 
-        width: 90, 
-        height: 180, 
+        width: isMobile ? 60 : 90,
+        height: isMobile ? 120 : 180,
         mass: 5, 
         imagePath: './images/S__56541200_0.png',
         name: 'ジャンプポーズ3'
@@ -668,9 +668,10 @@ document.addEventListener('keyup', function(event) {
 function setupMobileControls() {
     // モバイルデバイスの場合のみ、カスタムコントロールを設定
     if (isMobile) {
+        // 操作ボタン用のコンテナ
         const controlsContainer = document.createElement('div');
         controlsContainer.style.position = 'fixed';
-        controlsContainer.style.bottom = '20px';
+        controlsContainer.style.bottom = '120px';  // 位置を上に移動
         controlsContainer.style.left = '50%';
         controlsContainer.style.transform = 'translateX(-50%)';
         controlsContainer.style.display = 'flex';
@@ -680,6 +681,7 @@ function setupMobileControls() {
         controlsContainer.style.maxWidth = '500px';
         controlsContainer.style.justifyContent = 'space-between';
         controlsContainer.style.padding = '0 20px';
+        controlsContainer.style.zIndex = '1000';  // 重なり順を制御
 
         // 左矢印ボタン
         const leftButton = document.createElement('button');
@@ -692,6 +694,7 @@ function setupMobileControls() {
         leftButton.style.borderRadius = '50%';
         leftButton.style.color = 'white';
         leftButton.style.cursor = 'pointer';
+        leftButton.style.zIndex = '1000';
 
         // 回転ボタン
         const rotateButton = document.createElement('button');
@@ -707,7 +710,8 @@ function setupMobileControls() {
         rotateButton.style.position = 'absolute';
         rotateButton.style.left = '50%';
         rotateButton.style.transform = 'translateX(-50%)';
-        rotateButton.style.bottom = '100px';
+        rotateButton.style.bottom = '200px';  // 位置を上に移動
+        rotateButton.style.zIndex = '1000';
 
         // 右矢印ボタン
         const rightButton = document.createElement('button');
@@ -720,6 +724,7 @@ function setupMobileControls() {
         rightButton.style.borderRadius = '50%';
         rightButton.style.color = 'white';
         rightButton.style.cursor = 'pointer';
+        rightButton.style.zIndex = '1000';
 
         // 次のポーズボタン
         const nextPoseButton = document.createElement('button');
@@ -732,10 +737,11 @@ function setupMobileControls() {
         nextPoseButton.style.borderRadius = '10px';
         nextPoseButton.style.color = 'white';
         nextPoseButton.style.cursor = 'pointer';
-        nextPoseButton.style.position = 'absolute';
+        nextPoseButton.style.position = 'fixed';  // positionをfixedに変更
         nextPoseButton.style.left = '50%';
         nextPoseButton.style.transform = 'translateX(-50%)';
-        nextPoseButton.style.bottom = '20px';
+        nextPoseButton.style.bottom = '40px';  // 位置を調整
+        nextPoseButton.style.zIndex = '1000';
 
         // ボタンのイベントリスナー
         leftButton.addEventListener('touchstart', () => { controlState.left = true; });
