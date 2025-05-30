@@ -33,85 +33,85 @@ let targetCameraY = 0;
 // ポーズの設定（画像パスを追加）
 const POSES = {
     pose1: { 
-        width: isMobile ? 45 : 90,  // モバイルの場合は50%サイズ
-        height: isMobile ? 90 : 180, 
+        width: 90,  // PCサイズを固定
+        height: 180, 
         mass: 5, 
         imagePath: './images/S__56541186_0.png',
         name: '両手上げポーズ1'
     },
     pose2: { 
-        width: isMobile ? 45 : 90,
-        height: isMobile ? 90 : 180,
+        width: 90,
+        height: 180,
         mass: 5, 
         imagePath: './images/S__56541188_0.png',
         name: '片手上げポーズ1'
     },
     pose3: { 
-        width: isMobile ? 45 : 90,
-        height: isMobile ? 90 : 180,
+        width: 90,
+        height: 180,
         mass: 5, 
         imagePath: './images/S__56541189_0.png',
         name: '両手上げポーズ2'
     },
     pose4: { 
-        width: isMobile ? 45 : 90,
-        height: isMobile ? 90 : 180,
+        width: 90,
+        height: 180,
         mass: 5, 
         imagePath: './images/S__56541190_0.png',
         name: 'バンザイポーズ'
     },
     pose5: { 
-        width: isMobile ? 45 : 90,
-        height: isMobile ? 90 : 180,
+        width: 90,
+        height: 180,
         mass: 5, 
         imagePath: './images/S__56541191_0.png',
         name: '両手広げポーズ'
     },
     pose6: { 
-        width: isMobile ? 45 : 90,
-        height: isMobile ? 90 : 180,
+        width: 90,
+        height: 180,
         mass: 5, 
         imagePath: './images/S__56541192_0.png',
         name: 'ジャンプポーズ1'
     },
     pose7: { 
-        width: isMobile ? 45 : 90,
-        height: isMobile ? 90 : 180,
+        width: 90,
+        height: 180,
         mass: 5, 
         imagePath: './images/S__56541193_0.png',
         name: '片手上げポーズ2'
     },
     pose8: { 
-        width: isMobile ? 45 : 90,
-        height: isMobile ? 90 : 180,
+        width: 90,
+        height: 180,
         mass: 5, 
         imagePath: './images/S__56541194_0.png',
         name: '両手広げポーズ2'
     },
     pose9: { 
-        width: isMobile ? 45 : 90,
-        height: isMobile ? 90 : 180,
+        width: 90,
+        height: 180,
         mass: 5, 
         imagePath: './images/S__56541195_0.png',
         name: '横向きポーズ1'
     },
     pose10: { 
-        width: isMobile ? 45 : 90,
-        height: isMobile ? 90 : 180,
+        width: 90,
+        height: 180,
         mass: 5, 
         imagePath: './images/S__56541196_0.png',
         name: '片手上げポーズ3'
     },
     pose11: { 
-        width: isMobile ? 45 : 90,
-        height: isMobile ? 90 : 180,
+        width: 90,
+        height: 180,
         mass: 5, 
         imagePath: './images/S__56541199_0.png',
         name: 'ジャンプポーズ2'
     },
     pose12: { 
-        width: isMobile ? 45 : 90,
-        height: isMobile ? 90 : 180,
+        width: 90,
+        height: 180,
         mass: 5, 
         imagePath: './images/S__56541200_0.png',
         name: 'ジャンプポーズ3'
@@ -723,8 +723,17 @@ function setupMobileControls() {
 
         rotateButton.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            if (activeBody) {
-                Body.rotate(activeBody, Math.PI / 2);
+            if (activeBody && !activeBody.isLanded) {
+                const currentAngle = activeBody.angle;
+                Body.setAngle(activeBody, currentAngle + Math.PI/2);
+                Body.setAngularVelocity(activeBody, 0);
+            }
+        });
+
+        // スペースキーで新しいポーズを生成
+        document.addEventListener('touchstart', (e) => {
+            if (!activeBody || activeBody.isLanded) {
+                createPose();
             }
         });
 
