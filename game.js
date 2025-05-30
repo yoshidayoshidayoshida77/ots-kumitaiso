@@ -644,122 +644,115 @@ document.addEventListener('keyup', function(event) {
 
 // タッチ操作の設定
 function setupMobileControls() {
-    const controlsContainer = document.createElement('div');
-    controlsContainer.style.position = 'fixed';
-    controlsContainer.style.bottom = '20px';
-    controlsContainer.style.left = '50%';
-    controlsContainer.style.transform = 'translateX(-50%)';
-    controlsContainer.style.display = 'flex';
-    controlsContainer.style.gap = '20px';
-    controlsContainer.style.alignItems = 'center';
-    controlsContainer.style.width = '100%';
-    controlsContainer.style.maxWidth = '500px';
-    controlsContainer.style.justifyContent = 'space-between';
-    controlsContainer.style.padding = '0 20px';
+    // モバイルデバイスの場合のみ、カスタムコントロールを設定
+    if (isMobile) {
+        const controlsContainer = document.createElement('div');
+        controlsContainer.style.position = 'fixed';
+        controlsContainer.style.bottom = '20px';
+        controlsContainer.style.left = '50%';
+        controlsContainer.style.transform = 'translateX(-50%)';
+        controlsContainer.style.display = 'flex';
+        controlsContainer.style.gap = '20px';
+        controlsContainer.style.alignItems = 'center';
+        controlsContainer.style.width = '100%';
+        controlsContainer.style.maxWidth = '500px';
+        controlsContainer.style.justifyContent = 'space-between';
+        controlsContainer.style.padding = '0 20px';
 
-    // 左矢印ボタン
-    const leftButton = document.createElement('button');
-    leftButton.innerHTML = '←';
-    leftButton.style.width = '60px';
-    leftButton.style.height = '60px';
-    leftButton.style.fontSize = '24px';
-    leftButton.style.backgroundColor = '#4CAF50';
-    leftButton.style.border = 'none';
-    leftButton.style.borderRadius = '50%';
-    leftButton.style.color = 'white';
-    leftButton.style.cursor = 'pointer';
+        // 左矢印ボタン
+        const leftButton = document.createElement('button');
+        leftButton.innerHTML = '←';
+        leftButton.style.width = '60px';
+        leftButton.style.height = '60px';
+        leftButton.style.fontSize = '24px';
+        leftButton.style.backgroundColor = '#4CAF50';
+        leftButton.style.border = 'none';
+        leftButton.style.borderRadius = '50%';
+        leftButton.style.color = 'white';
+        leftButton.style.cursor = 'pointer';
 
-    // 回転ボタン
-    const rotateButton = document.createElement('button');
-    rotateButton.innerHTML = '回転';
-    rotateButton.style.width = '80px';
-    rotateButton.style.height = '60px';
-    rotateButton.style.fontSize = '18px';
-    rotateButton.style.backgroundColor = '#2196F3';
-    rotateButton.style.border = 'none';
-    rotateButton.style.borderRadius = '10px';
-    rotateButton.style.color = 'white';
-    rotateButton.style.cursor = 'pointer';
-    rotateButton.style.position = 'absolute';
-    rotateButton.style.left = '50%';
-    rotateButton.style.transform = 'translateX(-50%)';
-    rotateButton.style.bottom = '100px';  // 回転ボタンを上に移動
+        // 回転ボタン
+        const rotateButton = document.createElement('button');
+        rotateButton.innerHTML = '回転';
+        rotateButton.style.width = '80px';
+        rotateButton.style.height = '60px';
+        rotateButton.style.fontSize = '18px';
+        rotateButton.style.backgroundColor = '#2196F3';
+        rotateButton.style.border = 'none';
+        rotateButton.style.borderRadius = '10px';
+        rotateButton.style.color = 'white';
+        rotateButton.style.cursor = 'pointer';
+        rotateButton.style.position = 'absolute';
+        rotateButton.style.left = '50%';
+        rotateButton.style.transform = 'translateX(-50%)';
+        rotateButton.style.bottom = '100px';
 
-    // 右矢印ボタン
-    const rightButton = document.createElement('button');
-    rightButton.innerHTML = '→';
-    rightButton.style.width = '60px';
-    rightButton.style.height = '60px';
-    rightButton.style.fontSize = '24px';
-    rightButton.style.backgroundColor = '#4CAF50';
-    rightButton.style.border = 'none';
-    rightButton.style.borderRadius = '50%';
-    rightButton.style.color = 'white';
-    rightButton.style.cursor = 'pointer';
+        // 右矢印ボタン
+        const rightButton = document.createElement('button');
+        rightButton.innerHTML = '→';
+        rightButton.style.width = '60px';
+        rightButton.style.height = '60px';
+        rightButton.style.fontSize = '24px';
+        rightButton.style.backgroundColor = '#4CAF50';
+        rightButton.style.border = 'none';
+        rightButton.style.borderRadius = '50%';
+        rightButton.style.color = 'white';
+        rightButton.style.cursor = 'pointer';
 
-    // 次のポーズボタン
-    const nextPoseButton = document.createElement('button');
-    nextPoseButton.innerHTML = '次のポーズ';
-    nextPoseButton.style.width = '120px';
-    nextPoseButton.style.height = '60px';
-    nextPoseButton.style.fontSize = '16px';
-    nextPoseButton.style.backgroundColor = '#FF5722';
-    nextPoseButton.style.border = 'none';
-    nextPoseButton.style.borderRadius = '10px';
-    nextPoseButton.style.color = 'white';
-    nextPoseButton.style.cursor = 'pointer';
-    nextPoseButton.style.position = 'absolute';
-    nextPoseButton.style.left = '50%';
-    nextPoseButton.style.transform = 'translateX(-50%)';
-    nextPoseButton.style.bottom = '20px';  // 次のポーズボタンを下に配置
+        // 次のポーズボタン
+        const nextPoseButton = document.createElement('button');
+        nextPoseButton.innerHTML = '次のポーズ';
+        nextPoseButton.style.width = '120px';
+        nextPoseButton.style.height = '60px';
+        nextPoseButton.style.fontSize = '16px';
+        nextPoseButton.style.backgroundColor = '#FF5722';
+        nextPoseButton.style.border = 'none';
+        nextPoseButton.style.borderRadius = '10px';
+        nextPoseButton.style.color = 'white';
+        nextPoseButton.style.cursor = 'pointer';
+        nextPoseButton.style.position = 'absolute';
+        nextPoseButton.style.left = '50%';
+        nextPoseButton.style.transform = 'translateX(-50%)';
+        nextPoseButton.style.bottom = '20px';
 
-    // ボタンのイベントリスナー
-    leftButton.addEventListener('touchstart', () => { controlState.left = true; });
-    leftButton.addEventListener('touchend', () => { controlState.left = false; });
-    leftButton.addEventListener('mousedown', () => { controlState.left = true; });
-    leftButton.addEventListener('mouseup', () => { controlState.left = false; });
+        // ボタンのイベントリスナー
+        leftButton.addEventListener('touchstart', () => { controlState.left = true; });
+        leftButton.addEventListener('touchend', () => { controlState.left = false; });
 
-    rightButton.addEventListener('touchstart', () => { controlState.right = true; });
-    rightButton.addEventListener('touchend', () => { controlState.right = false; });
-    rightButton.addEventListener('mousedown', () => { controlState.right = true; });
-    rightButton.addEventListener('mouseup', () => { controlState.right = false; });
+        rightButton.addEventListener('touchstart', () => { controlState.right = true; });
+        rightButton.addEventListener('touchend', () => { controlState.right = false; });
 
-    rotateButton.addEventListener('click', () => {
-        if (activeBody) {
-            Body.rotate(activeBody, Math.PI / 2);
-        }
-    });
-    rotateButton.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        if (activeBody) {
-            Body.rotate(activeBody, Math.PI / 2);
-        }
-    });
+        rotateButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (activeBody) {
+                Body.rotate(activeBody, Math.PI / 2);
+            }
+        });
 
-    nextPoseButton.addEventListener('click', createPose);
-    nextPoseButton.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        createPose();
-    });
+        nextPoseButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            createPose();
+        });
 
-    controlsContainer.appendChild(leftButton);
-    controlsContainer.appendChild(rightButton);
-    document.body.appendChild(rotateButton);
-    document.body.appendChild(nextPoseButton);
-    document.body.appendChild(controlsContainer);
+        controlsContainer.appendChild(leftButton);
+        controlsContainer.appendChild(rightButton);
+        document.body.appendChild(rotateButton);
+        document.body.appendChild(nextPoseButton);
+        document.body.appendChild(controlsContainer);
 
-    // タッチイベントの無効化（スワイプ操作を削除）
-    render.canvas.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-    }, { passive: false });
+        // タッチイベントの無効化（スワイプ操作を削除）
+        render.canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+        }, { passive: false });
 
-    render.canvas.addEventListener('touchmove', (e) => {
-        e.preventDefault();
-    }, { passive: false });
+        render.canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        }, { passive: false });
 
-    render.canvas.addEventListener('touchend', (e) => {
-        e.preventDefault();
-    }, { passive: false });
+        render.canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+    }
 }
 
 // 画像の読み込み
