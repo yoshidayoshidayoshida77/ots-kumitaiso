@@ -4,12 +4,15 @@ const { Engine, Render, World, Bodies, Body, Events, Mouse, MouseConstraint, Que
 // デバッグモード
 const DEBUG = true;
 
+// デバイスチェック
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
 // ゲーム設定
-const CANVAS_WIDTH = window.innerWidth * 0.95;  // 画面幅の95%
-const CANVAS_HEIGHT = window.innerHeight * 0.8; // 画面高さの80%
+const CANVAS_WIDTH = isMobile ? window.innerWidth * 0.95 : 800;  // モバイルの場合は画面幅の95%、PCは800px
+const CANVAS_HEIGHT = isMobile ? window.innerHeight * 0.8 : 600; // モバイルの場合は画面高さの80%、PCは600px
 const GROUND_HEIGHT = 60;
 const WALL_THICKNESS = 60;
-const PLATFORM_WIDTH = CANVAS_WIDTH * 0.4;  // キャンバス幅の40%
+const PLATFORM_WIDTH = isMobile ? CANVAS_WIDTH * 0.4 : 300;  // モバイルの場合はキャンバス幅の40%、PCは300px
 const PLATFORM_HEIGHT = 20;
 const SPAWN_INTERVAL = 3000; // ミリ秒
 const MAX_BODIES = 30; // 最大物体数
