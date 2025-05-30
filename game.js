@@ -380,7 +380,7 @@ function checkGameOver() {
     // プラットフォームの範囲を取得
     const platformLeft = CANVAS_WIDTH / 2 - PLATFORM_WIDTH / 2;
     const platformRight = CANVAS_WIDTH / 2 + PLATFORM_WIDTH / 2;
-    const platformY = CANVAS_HEIGHT - GROUND_HEIGHT - PLATFORM_HEIGHT;
+    const platformY = CANVAS_HEIGHT - (isMobile ? 160 : 280);
 
     // 最も高いポーズの位置を取得
     const highestBody = bodies.reduce((highest, body) => {
@@ -388,7 +388,7 @@ function checkGameOver() {
     }, bodies[0]);
 
     // 画面上部に到達したかチェック（成功）
-    if (highestBody.position.y < 100) {  // 画面上部から100pxの位置を成功ラインとする
+    if (highestBody.position.y < 100) {
         endGame('success');
         return;
     }
@@ -398,25 +398,24 @@ function checkGameOver() {
         const bodyLeft = body.bounds.min.x;
         const bodyRight = body.bounds.max.x;
         const bodyBottom = body.bounds.max.y;
+        const bodyTop = body.bounds.min.y;
 
         // プラットフォームの範囲外に出たかチェック
-        // ポーズの端がプラットフォームの範囲外に出たらゲームオーバー
-        const isOffPlatform = (bodyLeft < platformLeft) || (bodyRight > platformRight);
+        const isOffPlatform = (bodyLeft < platformLeft || bodyRight > platformRight);
 
         // プラットフォームより下に落ちたかチェック
         const hasFallen = bodyBottom > platformY + PLATFORM_HEIGHT;
 
-        if (isOffPlatform && hasFallen) {
+        // 地面より下に落ちたかチェック
+        const hasFallenBelowGround = bodyBottom > CANVAS_HEIGHT - (isMobile ? 140 : 260) + GROUND_HEIGHT;
+
+        if ((isOffPlatform && hasFallen) || hasFallenBelowGround) {
             if (DEBUG) {
-                console.log('Game Over - Body bounds:', {
+                console.log('Game Over - Body position:', {
                     left: bodyLeft,
                     right: bodyRight,
-                    bottom: bodyBottom
-                });
-                console.log('Platform bounds:', {
-                    left: platformLeft,
-                    right: platformRight,
-                    y: platformY
+                    bottom: bodyBottom,
+                    top: bodyTop
                 });
             }
             endGame('failure');
@@ -662,12 +661,21 @@ function setupMobileControls() {
         controlsContainer.style.bottom = '0';
         controlsContainer.style.left = '0';
         controlsContainer.style.width = '100%';
-        controlsContainer.style.padding = '20px';
+        controlsContainer.style.padding = '10px';
         controlsContainer.style.backgroundColor = '#f0f0f0';
         controlsContainer.style.display = 'grid';
         controlsContainer.style.gridTemplateColumns = 'repeat(4, 1fr)';
         controlsContainer.style.gap = '10px';
         controlsContainer.style.zIndex = '1000';
+
+        // 既存のボタンを削除
+        const existingButtons = document.querySelectorAll('button');
+        existingButtons.forEach(button => {
+            if (button.innerHTML === '←' || button.innerHTML === '→' || 
+                button.innerHTML === '回転' || button.innerHTML === '次のポーズ') {
+                button.remove();
+            }
+        });
 
         // 左矢印ボタン
         const leftButton = document.createElement('button');
@@ -872,4 +880,14 @@ function createPose() {
     activeBody = body;
     World.add(world, body);
     if (DEBUG) console.log('New pose created and active');
-} 
+}
+
+// スワイプ説明テキストを削除
+document.addEventListener('DOMContentLoaded', function() {
+    const helpTexts = document.querySelectorAll('div');
+    helpTexts.forEach(text => {
+        if (text.textContent.includes('スワイプ') || text.textContent.includes('タップ')) {
+            text.remove();
+        }
+    });
+}); 
