@@ -769,6 +769,7 @@ function setupMobileControls() {
         nextPoseButton.addEventListener('touchstart', (e) => {
             e.preventDefault();
             nextPoseButton.style.backgroundColor = '#ccc';
+            if (DEBUG) console.log('Next pose button pressed');
             createPose();
         });
         nextPoseButton.addEventListener('touchend', () => {
@@ -829,8 +830,6 @@ loadImages();
 
 // 新しいポーズの作成
 function createPose() {
-    if (!gameState.isPlaying) return;
-    
     if (DEBUG) console.log('Creating new pose...');
     
     // 物体数をチェック
@@ -841,13 +840,10 @@ function createPose() {
     }
     
     // 既存のactiveBodyがある場合は、それを着地済みとしてマーク
-    if (activeBody) {
-        if (!activeBody.isLanded) {
-            activeBody.isLanded = true;
-            gameState.peopleCount++;
-            if (DEBUG) console.log('People count (from createPose):', gameState.peopleCount);
-        }
-        activeBody = null;
+    if (activeBody && !activeBody.isLanded) {
+        activeBody.isLanded = true;
+        gameState.peopleCount++;
+        if (DEBUG) console.log('People count (from createPose):', gameState.peopleCount);
     }
     
     const type = getRandomPoseType();
@@ -858,17 +854,17 @@ function createPose() {
         return;
     }
 
-    // 新しいポーズを生成（空気抵抗を若干増加）
+    // 新しいポーズを生成
     const body = Bodies.rectangle(
         CANVAS_WIDTH / 2,
         50,
         pose.width,
         pose.height,
         {
-            mass: 1,
-            restitution: 0,     // 反発なし
-            friction: 0.5,      // 標準的な摩擦
-            frictionAir: 0.002, // 空気抵抗を少し増加
+            mass: pose.mass,
+            restitution: 0,
+            friction: 0.5,
+            frictionAir: 0.002,
             isLanded: false,
             render: {
                 sprite: {
@@ -886,7 +882,13 @@ function createPose() {
 
     activeBody = body;
     World.add(world, body);
-    if (DEBUG) console.log('New pose created and active');
+    
+    if (DEBUG) console.log('New pose created:', {
+        type: type,
+        width: pose.width,
+        height: pose.height,
+        position: body.position
+    });
 }
 
 // スワイプ説明テキストを削除
