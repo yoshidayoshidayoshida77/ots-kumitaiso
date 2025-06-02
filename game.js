@@ -769,8 +769,9 @@ function setupMobileControls() {
         nextPoseButton.addEventListener('touchstart', (e) => {
             e.preventDefault();
             nextPoseButton.style.backgroundColor = '#ccc';
-            if (DEBUG) console.log('Next pose button pressed');
-            createPose();
+            if (!activeBody || activeBody.isLanded) {
+                createPose();
+            }
         });
         nextPoseButton.addEventListener('touchend', () => {
             nextPoseButton.style.backgroundColor = '#e0e0e0';
@@ -830,6 +831,8 @@ loadImages();
 
 // 新しいポーズの作成
 function createPose() {
+    if (!gameState.isPlaying) return;
+    
     if (DEBUG) console.log('Creating new pose...');
     
     // 物体数をチェック
@@ -840,10 +843,12 @@ function createPose() {
     }
     
     // 既存のactiveBodyがある場合は、それを着地済みとしてマーク
-    if (activeBody && !activeBody.isLanded) {
-        activeBody.isLanded = true;
-        gameState.peopleCount++;
-        if (DEBUG) console.log('People count (from createPose):', gameState.peopleCount);
+    if (activeBody) {
+        if (!activeBody.isLanded) {
+            activeBody.isLanded = true;
+            gameState.peopleCount++;
+        }
+        activeBody = null;
     }
     
     const type = getRandomPoseType();
@@ -861,7 +866,7 @@ function createPose() {
         pose.width,
         pose.height,
         {
-            mass: pose.mass,
+            mass: 1,
             restitution: 0,
             friction: 0.5,
             frictionAir: 0.002,
@@ -882,13 +887,7 @@ function createPose() {
 
     activeBody = body;
     World.add(world, body);
-    
-    if (DEBUG) console.log('New pose created:', {
-        type: type,
-        width: pose.width,
-        height: pose.height,
-        position: body.position
-    });
+    if (DEBUG) console.log('New pose created and active');
 }
 
 // スワイプ説明テキストを削除
