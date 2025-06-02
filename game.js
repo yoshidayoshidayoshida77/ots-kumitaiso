@@ -144,7 +144,8 @@ const render = Render.create({
         width: CANVAS_WIDTH,
         height: CANVAS_HEIGHT,
         wireframes: false,
-        background: '#87CEEB'
+        background: '#87CEEB',
+        hasBounds: true
     }
 });
 
@@ -166,7 +167,8 @@ const ground = Bodies.rectangle(
         restitution: 0,
         render: { 
             fillStyle: '#2E8B57',
-            visible: true
+            visible: true,
+            zIndex: 2
         } 
     }
 );
@@ -180,7 +182,10 @@ const leftWall = Bodies.rectangle(
         isStatic: true, 
         friction: 1,
         restitution: 0,
-        render: { fillStyle: '#2E8B57' } 
+        render: { 
+            fillStyle: '#2E8B57',
+            zIndex: 1
+        } 
     }
 );
 
@@ -193,7 +198,10 @@ const rightWall = Bodies.rectangle(
         isStatic: true, 
         friction: 1,
         restitution: 0,
-        render: { fillStyle: '#2E8B57' } 
+        render: { 
+            fillStyle: '#2E8B57',
+            zIndex: 1
+        } 
     }
 );
 
@@ -209,7 +217,8 @@ const platform = Bodies.rectangle(
         restitution: 0,
         render: { 
             fillStyle: '#4a4a4a',
-            visible: true
+            visible: true,
+            zIndex: 2
         }
     }
 );
@@ -760,9 +769,7 @@ function setupMobileControls() {
         nextPoseButton.addEventListener('touchstart', (e) => {
             e.preventDefault();
             nextPoseButton.style.backgroundColor = '#ccc';
-            if (!activeBody || activeBody.isLanded) {
-                createPose();
-            }
+            createPose();
         });
         nextPoseButton.addEventListener('touchend', () => {
             nextPoseButton.style.backgroundColor = '#e0e0e0';
