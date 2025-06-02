@@ -1,134 +1,137 @@
-// ---- JavaScript本体（game.js） ----
-// Matter.jsモジュールの設定
-const { Engine, Render, World, Bodies, Body, Events, Mouse, MouseConstraint } = Matter;
+// Matter.jsの基本セットアップ
+const { Engine, Render, World, Bodies, Body, Events } = Matter;
 
-// ゲーム設定
-const CANVAS_WIDTH = 800;
+const CANVAS_WIDTH = 400;
 const CANVAS_HEIGHT = 600;
-const GROUND_HEIGHT = 60;
-const WALL_THICKNESS = 60;
-const PLATFORM_WIDTH = 300;
+const GROUND_HEIGHT = 40;
+const POSE_WIDTH = 40;
+const POSE_HEIGHT = 80;
+const PLATFORM_WIDTH = 200;
 const PLATFORM_HEIGHT = 20;
-const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-const engine = Engine.create({
-  enableSleeping: true,
-  gravity: { x: 0, y: 0.15 }
-});
-const world = engine.world;
+let engine = Engine.create();
+let world = engine.world;
 
-const render = Render.create({
-  canvas: document.getElementById('game-canvas'),
-  engine: engine,
-  options: {
-    width: CANVAS_WIDTH,
-    height: CANVAS_HEIGHT,
-    wireframes: false,
-    background: '#87CEEB',
-    hasBounds: true
-  }
+let render = Render.create({
+    element: document.body,
+    engine: engine,
+    options: {
+        width: CANVAS_WIDTH,
+        height: CANVAS_HEIGHT,
+        wireframes: false,
+        background: '#87CEEB'
+    }
 });
 
-Render.run(render);
-Engine.run(engine);
+// 土台
+const platform = Bodies.rectangle(
+    CANVAS_WIDTH / 2,
+    CANVAS_HEIGHT - GROUND_HEIGHT - PLATFORM_HEIGHT / 2,
+    PLATFORM_WIDTH,
+    PLATFORM_HEIGHT,
+    { isStatic: true, render: { fillStyle: '#444' } }
+);
+// 地面
+const ground = Bodies.rectangle(
+    CANVAS_WIDTH / 2,
+    CANVAS_HEIGHT - GROUND_HEIGHT / 2,
+    CANVAS_WIDTH,
+    GROUND_HEIGHT,
+    { isStatic: true, render: { fillStyle: '#228B22' } }
+);
+// 壁
+const leftWall = Bodies.rectangle(0, CANVAS_HEIGHT / 2, 20, CANVAS_HEIGHT, { isStatic: true });
+const rightWall = Bodies.rectangle(CANVAS_WIDTH, CANVAS_HEIGHT / 2, 20, CANVAS_HEIGHT, { isStatic: true });
 
-const ground = Bodies.rectangle(CANVAS_WIDTH / 2, CANVAS_HEIGHT - 30, CANVAS_WIDTH, GROUND_HEIGHT, {
-  isStatic: true,
-  render: { fillStyle: '#2E8B57' }
-});
-const leftWall = Bodies.rectangle(0, CANVAS_HEIGHT / 2, WALL_THICKNESS, CANVAS_HEIGHT, {
-  isStatic: true,
-  render: { fillStyle: '#2E8B57' }
-});
-const rightWall = Bodies.rectangle(CANVAS_WIDTH, CANVAS_HEIGHT / 2, WALL_THICKNESS, CANVAS_HEIGHT, {
-  isStatic: true,
-  render: { fillStyle: '#2E8B57' }
-});
-const platform = Bodies.rectangle(CANVAS_WIDTH / 2, CANVAS_HEIGHT - 100, PLATFORM_WIDTH, PLATFORM_HEIGHT, {
-  isStatic: true,
-  render: { fillStyle: '#4a4a4a' }
-});
-
-World.add(world, [ground, leftWall, rightWall, platform]);
-
-const mouse = Mouse.create(render.canvas);
-const mouseConstraint = MouseConstraint.create(engine, {
-  mouse: mouse,
-  constraint: {
-    stiffness: 0.2,
-    render: { visible: false }
-  }
-});
-World.add(world, mouseConstraint);
-render.mouse = mouse;
+World.add(world, [platform, ground, leftWall, rightWall]);
 
 let activeBody = null;
-let isPlaying = false;
-let imageLoaded = false;
-let poseImage = new Image();
-poseImage.src = './images/S__56541186_0.png';
-poseImage.onload = () => { imageLoaded = true; };
+let stackedCount = 0;
+let isGameOver = false;
 
-function createPose() {
-  if (!isPlaying || !imageLoaded) return;
-
-  const width = isMobile ? 45 : 90;
-  const height = isMobile ? 90 : 180;
-
-  const body = Bodies.rectangle(
-    CANVAS_WIDTH / 2,
-    -100,
-    width,
-    height,
-    {
-      restitution: 0,
-      friction: 0.5,
-      frictionAir: 0.002,
-      render: {
-        sprite: {
-          texture: poseImage.src,
-          xScale: width / poseImage.width,
-          yScale: height / poseImage.height
+function spawnPose() {
+    activeBody = Bodies.rectangle(
+        CANVAS_WIDTH / 2,
+        60,
+        POSE_WIDTH,
+        POSE_HEIGHT,
+        {
+            restitution: 0,
+            friction: 0.5,
+            render: { fillStyle: '#fff' }
         }
-      }
+    );
+    World.add(world, activeBody);
+}
+
+function checkGameOver() {
+    if (!activeBody) return;
+    // 土台から落ちたらゲームオーバー
+    if (activeBody.position.y > CANVAS_HEIGHT - GROUND_HEIGHT - 10) {
+        isGameOver = true;
+        alert('ゲームオーバー！');
+        location.reload();
     }
-  );
-  activeBody = body;
-  World.add(world, body);
+    // 画面上部まで到達したらクリア
+    if (activeBody.position.y < 60) {
+        isGameOver = true;
+        alert('組体操完成！');
+        location.reload();
+    }
 }
 
-function startGame() {
-  document.getElementById('start-screen').style.display = 'none';
-  isPlaying = true;
-  createPose();
-  gameLoop();
+function freezeBody(body) {
+    Body.setStatic(body, true);
+    activeBody = null;
+    stackedCount++;
+    spawnPose();
 }
 
-function gameLoop() {
-  if (!isPlaying) return;
-
-  if (activeBody && activeBody.position.y > CANVAS_HEIGHT) {
-    endGame();
-  }
-
-  requestAnimationFrame(gameLoop);
-}
-
-function endGame() {
-  isPlaying = false;
-  document.getElementById('game-over-screen').style.display = 'block';
-}
-
-document.addEventListener('keydown', function(event) {
-  if (!isPlaying || !activeBody) return;
-  let velocityX = 0;
-  if (event.code === 'ArrowLeft') velocityX = -3;
-  if (event.code === 'ArrowRight') velocityX = 3;
-  Body.setVelocity(activeBody, { x: velocityX, y: activeBody.velocity.y });
-
-  if (event.code === 'Space') {
-    const angle = activeBody.angle;
-    Body.setAngle(activeBody, angle + Math.PI / 2);
-    Body.setAngularVelocity(activeBody, 0);
-  }
+// キー操作
+const controlState = { left: false, right: false };
+document.addEventListener('keydown', e => {
+    if (!activeBody || isGameOver) return;
+    if (e.code === 'ArrowLeft') controlState.left = true;
+    if (e.code === 'ArrowRight') controlState.right = true;
+    if (e.code === 'Space') {
+        Body.setAngle(activeBody, activeBody.angle + Math.PI / 2);
+        Body.setAngularVelocity(activeBody, 0);
+    }
 });
+document.addEventListener('keyup', e => {
+    if (e.code === 'ArrowLeft') controlState.left = false;
+    if (e.code === 'ArrowRight') controlState.right = false;
+});
+
+// ゲームループ
+Events.on(engine, 'beforeUpdate', () => {
+    if (activeBody && !isGameOver) {
+        let vx = 0;
+        if (controlState.left) vx = -5;
+        if (controlState.right) vx = 5;
+        Body.setVelocity(activeBody, { x: vx, y: activeBody.velocity.y });
+    }
+});
+
+// 着地判定
+Events.on(engine, 'collisionStart', event => {
+    if (!activeBody || isGameOver) return;
+    for (let pair of event.pairs) {
+        if (pair.bodyA === activeBody && (pair.bodyB === platform || pair.bodyB.isStatic && pair.bodyB !== leftWall && pair.bodyB !== rightWall)) {
+            freezeBody(activeBody);
+        }
+        if (pair.bodyB === activeBody && (pair.bodyA === platform || pair.bodyA.isStatic && pair.bodyA !== leftWall && pair.bodyA !== rightWall)) {
+            freezeBody(activeBody);
+        }
+    }
+});
+
+// ゲームオーバー判定ループ
+(function gameLoop() {
+    if (!isGameOver) checkGameOver();
+    requestAnimationFrame(gameLoop);
+})();
+
+Engine.run(engine);
+Render.run(render);
+spawnPose();
